@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -47,6 +49,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Message::class)]
+    private Collection $messages;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
+    private Collection $reservations;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Address $address = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
+    private Collection $reviews;
+
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
+    private Collection $sentmessages;
+
+    #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Message::class)]
+    private Collection $receivedmessages;
+
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->sentmessages = new ArrayCollection();
+        $this->receivedmessages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -186,6 +216,138 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(Address $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getUser() === $this) {
+                $review->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getSentmessages(): Collection
+    {
+        return $this->sentmessages;
+    }
+
+    public function addSentmessage(Message $sentmessage): self
+    {
+        if (!$this->sentmessages->contains($sentmessage)) {
+            $this->sentmessages->add($sentmessage);
+            $sentmessage->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSentmessage(Message $sentmessage): self
+    {
+        if ($this->sentmessages->removeElement($sentmessage)) {
+            // set the owning side to null (unless already changed)
+            if ($sentmessage->getSender() === $this) {
+                $sentmessage->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getReceivedmessages(): Collection
+    {
+        return $this->receivedmessages;
+    }
+
+    public function addReceivedmessage(Message $receivedmessage): self
+    {
+        if (!$this->receivedmessages->contains($receivedmessage)) {
+            $this->receivedmessages->add($receivedmessage);
+            $receivedmessage->setReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReceivedmessage(Message $receivedmessage): self
+    {
+        if ($this->receivedmessages->removeElement($receivedmessage)) {
+            // set the owning side to null (unless already changed)
+            if ($receivedmessage->getReceiver() === $this) {
+                $receivedmessage->setReceiver(null);
+            }
+        }
 
         return $this;
     }

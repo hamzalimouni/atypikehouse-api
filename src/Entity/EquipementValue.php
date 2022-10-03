@@ -15,23 +15,41 @@ class EquipementValue
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 64)]
-    private ?string $value = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Equipement $equipement = null;
+
+    #[ORM\ManyToOne(inversedBy: 'equipements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?House $house = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getValue(): ?string
+    public function getEquipement(): ?Equipement
     {
-        return $this->value;
+        return $this->equipement;
     }
 
-    public function setValue(string $value): self
+    public function setEquipement(?Equipement $equipement): self
     {
-        $this->value = $value;
+        $this->equipement = $equipement;
 
         return $this;
     }
+
+    public function getHouse(): ?House
+    {
+        return $this->house;
+    }
+
+    public function setHouse(?House $house): self
+    {
+        $this->house = $house;
+
+        return $this;
+    }
+
 }
