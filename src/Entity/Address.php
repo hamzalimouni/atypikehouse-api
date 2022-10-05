@@ -6,35 +6,47 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AddressRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:address']],
+    denormalizationContext: ['groups' => ['write:address']],
+)]
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
 class Address
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:address'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['read:address', 'write:address'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(['read:address', 'write:address'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(['read:address', 'write:address'])]
     private ?string $state = null;
 
     #[ORM\Column]
+    #[Groups(['read:address', 'write:address'])]
     private ?int $zipcode = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(['read:address', 'write:address'])]
     private ?string $country = null;
 
     #[ORM\Column]
+    #[Groups(['read:address', 'write:address'])]
     private ?float $longitude = null;
 
     #[ORM\Column]
+    #[Groups(['read:address', 'write:address'])]
     private ?float $latitude = null;
 
     public function getId(): ?int

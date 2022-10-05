@@ -6,34 +6,45 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:reservation']],
+    denormalizationContext: ['groups' => ['write:reservation']],
+)]
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?float $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?\DateTimeInterface $toDate = null;
 
     #[ORM\Column]
+    #[Groups(['read:reservation', 'read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:reservation', 'write:reservation'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?House $house = null;
 
     public function getId(): ?int

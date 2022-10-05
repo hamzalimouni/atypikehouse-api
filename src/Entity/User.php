@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,63 +11,81 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message','read:review']],
+    denormalizationContext: ['groups' => ['write:user']],
+)]
+//#[Get(normalizationContext: ['groups' => ['read:user']])]
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('read:user', 'read:reservation', 'read:message', 'read:review')]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['read:user', 'write:user'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['write:user'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 32)]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 32)]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 32)]
+    #[Groups(['read:user', 'write:user', 'read:reservation'])]
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['read:user', 'write:user'])]
     private ?\DateTimeInterface $birthday = null;
 
     #[ORM\Column(length: 32)]
+    #[Groups(['read:user', 'write:user'])]
     private ?string $status = null;
 
     #[ORM\Column]
+    #[Groups(['read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Message::class)]
-    private Collection $messages;
-
+    #[Groups(['read:user'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
     private Collection $reservations;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:user', 'write:user', 'read:reservation'])]
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
+    #[Groups(['read:user'])]
     private Collection $reviews;
 
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
+    #[Groups(['read:user'])]
     private Collection $sentmessages;
 
     #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Message::class)]
+    #[Groups(['read:user'])]
     private Collection $receivedmessages;
 
     public function __construct()

@@ -8,61 +8,81 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review']],
+    denormalizationContext: ['groups' => ['write:house']],
+)]
 #[ORM\Entity(repositoryClass: HouseRepository::class)]
 class House
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:house', 'read:reservation', 'read:user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
     private ?string $title = null;
 
     #[ORM\ManyToOne(inversedBy: 'houses')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
     private ?Category $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Groups(['read:house', 'write:house'])]
     private ?int $nbPerson = null;
 
     #[ORM\Column]
+    #[Groups(['read:house', 'write:house'])]
     private ?float $surface = null;
 
     #[ORM\Column]
+    #[Groups(['read:house', 'write:house'])]
     private ?bool $disponible = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
     private ?string $photos = null;
 
     #[ORM\Column]
-    private ?bool $status = null;
+    #[Groups(['read:house', 'write:house'])]
+    private ?string $status = null;
 
     #[ORM\Column]
+    #[Groups(['read:house', 'read:reservation'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: EquipementValue::class)]
+    #[Groups(['read:house', 'write:house'])]
     private Collection $equipements;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class)]
+    #[Groups(['read:house', 'write:house'])]
     private Collection $properties;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Reservation::class)]
+    #[Groups(['read:house', 'write:house'])]
     private Collection $reservations;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:house', 'write:house'])]
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class)]
+    #[Groups(['read:house', 'write:house'])]
     private Collection $reviews;
 
     public function __construct()
@@ -162,12 +182,12 @@ class House
         return $this;
     }
 
-    public function isStatus(): ?bool
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(bool $status): self
+    public function setStatus(string $status): self
     {
         $this->status = $status;
 

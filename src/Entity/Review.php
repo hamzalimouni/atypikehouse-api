@@ -6,31 +6,41 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:review']],
+    denormalizationContext: ['groups' => ['write:review']],
+)]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('read:review', 'read:user')]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Groups('read:review', 'write:review', 'read:user')]
     private ?int $grade = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('read:review', 'write:review', 'read:user')]
     private ?string $comment = null;
 
     #[ORM\Column]
+    #[Groups('read:review', 'read:user')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('read:review', 'write:review')]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('read:review', 'write:review', 'read:user')]
     private ?House $house = null;
 
     public function getId(): ?int
