@@ -3,35 +3,66 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[Post(
+    denormalizationContext: ['groups' => ['write:category']],
+)]
+#[Get(
+    normalizationContext: ['groups' => ['read:category', 'read:property']],
+)]
+#[GetCollection(
+    normalizationContext: ['groups' => ['read:categorycollection', 'read:property']],
+)]
+#[Delete]
+#[Patch(
+    denormalizationContext: ['groups' => ['write:category']],
+)]
+/*#[Post(
+    normalizationContext: ['groups' => ['create:category']],
+)]*/
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:category', 'read:category', 'read:categorycollection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 128)]
+    #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['read:category', 'write:category', 'create:category', 'read:categorycollection'])]
     private ?bool $status = null;
 
     #[ORM\Column]
+    #[Groups(['read:category'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: House::class)]
+    #[Groups(['read:category'])]
     private Collection $houses;
+
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Propriety::class)]
+    #[Groups(['read:category'])]
+    private Collection $proprieties;
 
     public function __construct()
     {
         $this->houses = new ArrayCollection();
+        $this->proprieties = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,6 +130,36 @@ class Category
             // set the owning side to null (unless already changed)
             if ($house->getCategory() === $this) {
                 $house->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Propriety>
+     */
+    public function getProprieties(): Collection
+    {
+        return $this->proprieties;
+    }
+
+    public function addPropriety(Propriety $propriety): self
+    {
+        if (!$this->proprieties->contains($propriety)) {
+            $this->proprieties->add($propriety);
+            $propriety->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removePropriety(Propriety $propriety): self
+    {
+        if ($this->proprieties->removeElement($propriety)) {
+            // set the owning side to null (unless already changed)
+            if ($propriety->getCategory() === $this) {
+                $propriety->setCategory(null);
             }
         }
 

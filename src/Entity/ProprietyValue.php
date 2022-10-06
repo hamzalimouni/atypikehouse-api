@@ -5,25 +5,33 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProprietyValueRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:propertyvalue']],
+    denormalizationContext: ['groups' => ['write:propertyvalue']],
+)]
 #[ORM\Entity(repositoryClass: ProprietyValueRepository::class)]
 class ProprietyValue
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:propertyvalue', 'read:house'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(['read:propertyvalue', 'write:propertyvalue', 'read:house'])]
     private ?string $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Propriety $Propriety = null;
+    #[Groups(['read:propertyvalue', 'write:propertyvalue', 'read:house'])]
+    private ?Propriety $propriety = null;
 
     #[ORM\ManyToOne(inversedBy: 'properties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:propertyvalue', 'write:propertyvalue'])]
     private ?House $house = null;
 
     public function getId(): ?int
@@ -45,12 +53,12 @@ class ProprietyValue
 
     public function getPropriety(): ?Propriety
     {
-        return $this->Propriety;
+        return $this->propriety;
     }
 
-    public function setPropriety(?Propriety $Propriety): self
+    public function setPropriety(?Propriety $propriety): self
     {
-        $this->Propriety = $Propriety;
+        $this->propriety = $propriety;
 
         return $this;
     }

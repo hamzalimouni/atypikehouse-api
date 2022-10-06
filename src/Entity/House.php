@@ -2,7 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\HouseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,42 +17,53 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review']],
+#[GetCollection(
+    normalizationContext: ['groups' => ['read:housecollcetion']]
+)]
+#[Get(
+    normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
+)]
+#[Post(
+    denormalizationContext: ['groups' => ['write:house', 'write:address']],
+)]
+#[Patch(
     denormalizationContext: ['groups' => ['write:house']],
 )]
+#[Delete]
+//#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial', 'owner' => 'exact'])]
+
 #[ORM\Entity(repositoryClass: HouseRepository::class)]
 class House
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:house', 'read:reservation', 'read:user'])]
+    #[Groups(['read:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
     private ?string $title = null;
 
     #[ORM\ManyToOne(inversedBy: 'houses')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:housecollcetion'])]
     private ?Category $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     private ?int $nbPerson = null;
 
     #[ORM\Column]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     private ?float $surface = null;
 
     #[ORM\Column]
@@ -53,44 +71,50 @@ class House
     private ?bool $disponible = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user'])]
-    private ?string $photos = null;
+    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
+    private ?array $photos = null;
 
     #[ORM\Column]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     private ?string $status = null;
 
-    #[ORM\Column]
-    #[Groups(['read:house', 'read:reservation'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\OneToMany(mappedBy: 'house', targetEntity: EquipementValue::class)]
-    #[Groups(['read:house', 'write:house'])]
-    private Collection $equipements;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class)]
     #[Groups(['read:house', 'write:house'])]
     private Collection $properties;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Reservation::class)]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house'])]
     private Collection $reservations;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class)]
-    #[Groups(['read:house', 'write:house'])]
+    #[Groups(['read:house'])]
     private Collection $reviews;
+
+    #[ORM\ManyToMany(targetEntity: Equipement::class)]
+    #[Groups(['read:house', 'write:house'])]
+    private Collection $equipments;
+
+    #[ORM\ManyToOne(inversedBy: 'houses')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    private ?User $owner = null;
+
+    #[ORM\Column]
+    #[Groups(['read:house', 'read:reservation'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
-        $this->equipements = new ArrayCollection();
         $this->properties = new ArrayCollection();
         $this->reservations = new ArrayCollection();
         $this->reviews = new ArrayCollection();
+        $this->equipments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -170,12 +194,12 @@ class House
         return $this;
     }
 
-    public function getPhotos(): ?string
+    public function getPhotos(): ?array
     {
         return $this->photos;
     }
 
-    public function setPhotos(string $photos): self
+    public function setPhotos(array $photos): self
     {
         $this->photos = $photos;
 
@@ -218,35 +242,6 @@ class House
         return $this;
     }
 
-    /**
-     * @return Collection<int, EquipementValue>
-     */
-    public function getEquipements(): Collection
-    {
-        return $this->equipements;
-    }
-
-    public function addEquipement(EquipementValue $equipement): self
-    {
-        if (!$this->equipements->contains($equipement)) {
-            $this->equipements->add($equipement);
-            $equipement->setHouse($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEquipement(EquipementValue $equipement): self
-    {
-        if ($this->equipements->removeElement($equipement)) {
-            // set the owning side to null (unless already changed)
-            if ($equipement->getHouse() === $this) {
-                $equipement->setHouse(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, ProprietyValue>
@@ -346,6 +341,42 @@ class House
                 $review->setHouse(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipement>
+     */
+    public function getEquipments(): Collection
+    {
+        return $this->equipments;
+    }
+
+    public function addEquipment(Equipement $equipment): self
+    {
+        if (!$this->equipments->contains($equipment)) {
+            $this->equipments->add($equipment);
+        }
+
+        return $this;
+    }
+
+    public function removeEquipment(Equipement $equipment): self
+    {
+        $this->equipments->removeElement($equipment);
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

@@ -88,6 +88,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:user'])]
     private Collection $receivedmessages;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: House::class)]
+    #[Groups(['read:user'])]
+    private Collection $houses;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -95,6 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reviews = new ArrayCollection();
         $this->sentmessages = new ArrayCollection();
         $this->receivedmessages = new ArrayCollection();
+        $this->houses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -365,6 +370,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($receivedmessage->getReceiver() === $this) {
                 $receivedmessage->setReceiver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, House>
+     */
+    public function getHouses(): Collection
+    {
+        return $this->houses;
+    }
+
+    public function addHouse(House $house): self
+    {
+        if (!$this->houses->contains($house)) {
+            $this->houses->add($house);
+            $house->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHouse(House $house): self
+    {
+        if ($this->houses->removeElement($house)) {
+            // set the owning side to null (unless already changed)
+            if ($house->getOwner() === $this) {
+                $house->setOwner(null);
             }
         }
 

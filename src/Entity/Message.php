@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['read:message', 'read:user:profile']],
     denormalizationContext: ['groups' => ['write:message']],
 )]
+
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
 {
@@ -29,18 +31,18 @@ class Message
     #[Groups('read:message', 'write:message')]
     private ?string $type = null;
 
-    #[ORM\Column]
-    #[Groups('read:message')]
-    private ?\DateTimeImmutable $createdAt = null;
-
     #[ORM\ManyToOne(inversedBy: 'sentmessages')]
-    #[Groups('read:message', 'write:message', 'read:user')]
+    #[Groups('read:message', 'write:message', 'read:user', 'write:user')]
     private ?User $sender = null;
 
     #[ORM\ManyToOne(inversedBy: 'receivedmessages')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('read:message', 'write:message', 'read:user')]
+    #[Groups('read:message', 'write:message', 'read:user', 'write:user')]
     private ?User $receiver = null;
+
+    #[ORM\Column]
+    #[Groups('read:message')]
+    private ?\DateTimeImmutable $createdAt = null;
 
 
     public function getId(): ?int

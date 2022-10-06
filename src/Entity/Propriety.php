@@ -5,29 +5,44 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProprietyRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:property']],
+    denormalizationContext: ['groups' => ['write:property']],
+)]
 #[ORM\Entity(repositoryClass: ProprietyRepository::class)]
 class Propriety
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:property', 'read:propertyvalue', 'read:house'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(['read:property', 'write:property', 'read:propertyvalue', 'read:house'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 128)]
+    #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
     private ?bool $isRequired = null;
 
     #[ORM\Column]
+    #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
     private ?bool $status = null;
 
+    #[ORM\ManyToOne(inversedBy: 'proprieties')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
+    private ?Category $category = null;
+
     #[ORM\Column]
+    #[Groups(['read:propertyvalue', 'read:propertyvalue'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
@@ -91,6 +106,18 @@ class Propriety
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }
