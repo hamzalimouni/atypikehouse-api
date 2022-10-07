@@ -18,19 +18,21 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[GetCollection(
-    normalizationContext: ['groups' => ['read:housecollcetion']]
-)]
-#[Get(
-    normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
-)]
-#[Post(
-    denormalizationContext: ['groups' => ['write:house', 'write:address']],
-)]
-#[Patch(
-    denormalizationContext: ['groups' => ['write:house']],
-)]
-#[Delete]
+#[
+    GetCollection(
+        normalizationContext: ['groups' => ['read:housecollcetion']]
+    ),
+    Get(
+        normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
+    ),
+    Post(
+        denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+    ),
+    Patch(
+        denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+    ),
+    Delete
+]
 //#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial', 'owner' => 'exact'])]
 
 #[ORM\Entity(repositoryClass: HouseRepository::class)]

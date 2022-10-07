@@ -14,19 +14,25 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[Post(
-    denormalizationContext: ['groups' => ['write:category']],
-)]
-#[Get(
-    normalizationContext: ['groups' => ['read:category', 'read:property']],
-)]
-#[GetCollection(
-    normalizationContext: ['groups' => ['read:categorycollection', 'read:property']],
-)]
-#[Delete]
-#[Patch(
-    denormalizationContext: ['groups' => ['write:category']],
-)]
+#[
+    ApiResource(
+        operations: [
+            new Post(
+                denormalizationContext: ['groups' => ['write:category']],
+            ),
+            new Get(
+                normalizationContext: ['groups' => ['read:category', 'read:property']],
+            ),
+            new GetCollection(
+                normalizationContext: ['groups' => ['read:categorycollection', 'read:property']],
+            ),
+            new Patch(
+                denormalizationContext: ['groups' => ['write:category']],
+            ),
+            new Delete()
+        ]
+    )
+]
 /*#[Post(
     normalizationContext: ['groups' => ['create:category']],
 )]*/

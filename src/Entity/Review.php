@@ -7,41 +7,40 @@ use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['read:review']],
-    denormalizationContext: ['groups' => ['write:review']],
-)]
+#[
+    ApiResource(
+        normalizationContext: ['groups' => ['read:review']],
+        denormalizationContext: ['groups' => ['write:review']],
+    )
+]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('read:review', 'read:user')]
+    #[Groups(['read:review', 'read:user'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups('read:review', 'write:review', 'read:user')]
+    #[Groups(['read:review', 'write:review', 'read:user'])]
     /**
      * @Assert\NotBlank(message="Veuillez renseigner une note pour votre reservation")
      */
     private ?int $grade = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups('read:review', 'write:review', 'read:user')]
+    #[Groups(['read:review', 'write:review', 'read:user'])]
     /**
      * @Assert\NotBlank(message="Veuillez renseigner une description de ce que vous avez pensé du logement")
      */
     private ?string $comment = null;
 
-    #[ORM\Column]
-    #[Groups('read:review', 'read:user')]
-    private ?\DateTimeImmutable $createdAt = null;
-
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('read:review', 'write:review')]
+    #[Groups(['read:review', 'write:review'])]
     /**
      * @Assert\NotNull(message="Veuillez renseignez l'utilisateur")
      */
@@ -49,11 +48,15 @@ class Review
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('read:review', 'write:review', 'read:user')]
+    #[Groups(['read:review', 'write:review', 'read:user'])]
     /**
      * @Assert\NotNull(message="Veuillez renseignez le logement")
      */
     private ?House $house = null;
+
+    #[ORM\Column]
+    #[Groups(['read:review', 'read:user'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {

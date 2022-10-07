@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message', 'read:review']],
-    denormalizationContext: ['groups' => ['write:user']],
+    denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review']],
 )]
 //#[Get(normalizationContext: ['groups' => ['read:user']])]
 

@@ -34,8 +34,8 @@ class Reservation
     private ?\DateTimeInterface $toDate = null;
 
     #[ORM\Column]
-    #[Groups(['read:reservation', 'read:user'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    private ?int $nbPersons = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
@@ -46,6 +46,10 @@ class Reservation
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
     private ?House $house = null;
+
+    #[ORM\Column]
+    #[Groups(['read:reservation', 'read:user'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -120,6 +124,18 @@ class Reservation
     public function setHouse(?House $house): self
     {
         $this->house = $house;
+
+        return $this;
+    }
+
+    public function getNbPersons(): ?int
+    {
+        return $this->nbPersons;
+    }
+
+    public function setNbPersons(int $nbPersons): self
+    {
+        $this->nbPersons = $nbPersons;
 
         return $this;
     }

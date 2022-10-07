@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -11,12 +12,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['read:address']],
-    denormalizationContext: ['groups' => ['write:address']],
-)]
-#[Post]
-#[Patch]
+#[
+    ApiResource(
+        operations:[
+            new Post(),
+            new Get()
+        ],
+        normalizationContext: ['groups' => ['read:address']],
+        denormalizationContext: ['groups' => ['write:address']],
+    ),
+]
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
 class Address
 {
