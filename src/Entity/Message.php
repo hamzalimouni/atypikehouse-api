@@ -8,6 +8,7 @@ use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     normalizationContext: ['groups' => ['read:message', 'read:user:profile']],
@@ -25,14 +26,23 @@ class Message
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups('read:message', 'write:message')]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner le contenu pour votre commentaire")
+     */
     private ?string $content = null;
 
     #[ORM\Column(length: 128)]
     #[Groups('read:message', 'write:message')]
+    /**
+     * @Assert\NotNull(message="Veuillez renseigner le type pour votre commentaire")
+     */
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'sentmessages')]
     #[Groups('read:message', 'write:message', 'read:user', 'write:user')]
+    /**
+     * @Assert\NotNull(message="Veuillez renseignez l'utilisateur")
+     */
     private ?User $sender = null;
 
     #[ORM\ManyToOne(inversedBy: 'receivedmessages')]
@@ -109,5 +119,4 @@ class Message
 
         return $this;
     }
-
 }

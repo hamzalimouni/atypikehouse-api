@@ -12,9 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message','read:review']],
+    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message', 'read:review']],
     denormalizationContext: ['groups' => ['write:user']],
 )]
 //#[Get(normalizationContext: ['groups' => ['read:user']])]
@@ -29,6 +30,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    /**
+     * @Assert\Email(
+     * message = "Adresse email '{{ value }}' non valide.")
+     */
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
     private ?string $email = null;
 
@@ -38,6 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @var string The hashed password
+     * @Assert\Length(
+     *      min = 8,
+     *      max = 32,
+     *      minMessage = "Votre mot de passe doit contenir au minimum {{ limit }} caractères",
+     *      maxMessage = "Votre mot de passe doit contenir au maximum {{ limit }} caractères"
+     * )
      */
     #[ORM\Column]
     #[Groups(['write:user'])]
@@ -45,18 +56,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner votre prénom")
+     */
     private ?string $firstname = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner votre nom")
+     */
     private ?string $lastname = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner votre numéro de téléphone")
+     */
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['read:user', 'write:user'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner votre date de naissance")
+     */
     private ?\DateTimeInterface $birthday = null;
 
     #[ORM\Column(length: 32)]

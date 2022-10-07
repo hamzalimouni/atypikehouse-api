@@ -23,10 +23,16 @@ class Review
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups('read:review', 'write:review', 'read:user')]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner une note pour votre reservation")
+     */
     private ?int $grade = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups('read:review', 'write:review', 'read:user')]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner une description de ce que vous avez pensé du logement")
+     */
     private ?string $comment = null;
 
     #[ORM\Column]
@@ -36,11 +42,17 @@ class Review
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('read:review', 'write:review')]
+    /**
+     * @Assert\NotNull(message="Veuillez renseignez l'utilisateur")
+     */
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('read:review', 'write:review', 'read:user')]
+    /**
+     * @Assert\NotNull(message="Veuillez renseignez le logement")
+     */
     private ?House $house = null;
 
     public function getId(): ?int

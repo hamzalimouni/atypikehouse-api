@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[GetCollection(
     normalizationContext: ['groups' => ['read:housecollcetion']]
@@ -43,27 +44,54 @@ class House
 
     #[ORM\Column(length: 255)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner le nom de l'hébergement")
+     */
     private ?string $title = null;
 
     #[ORM\ManyToOne(inversedBy: 'houses')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:housecollcetion'])]
+    /**
+     * @Assert\NotNull(message="Veuillez renseignez la categorie à laquelle appartient votre hébergement")
+     */
     private ?Category $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
+    /**
+     * @Assert\NotBlank(message="Veuillez renseigner la description de cet hébergement")
+     */
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
+    /**
+     * @Assert\GreaterThan(
+     *     value = 0,
+     *     message ="Le prix doit etre superieur a 0"
+     * )
+     */
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    /**
+     * @Assert\GreaterThan(
+     *     value = 0,
+     *     message ="Vous devez renseigner le nombre de voyageurs que peut accueillir l'hébergement"
+     * )
+     */
     private ?int $nbPerson = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    /**
+     * @Assert\GreaterThan(
+     *     value = 0,
+     *     message ="La surface doit etre renseignée"
+     * )
+     */
     private ?float $surface = null;
 
     #[ORM\Column]
