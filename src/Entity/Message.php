@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\MessageRepository;
@@ -14,6 +16,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         normalizationContext: ['groups' => ['read:message']],
         denormalizationContext: ['groups' => ['write:message']],
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'sender.id' => SearchFilter::STRATEGY_EXACT,
+            'receiver.id' => SearchFilter::STRATEGY_EXACT,
+        ]
     )
 ]
 

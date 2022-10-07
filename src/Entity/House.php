@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -19,21 +22,46 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[
-    GetCollection(
-        normalizationContext: ['groups' => ['read:housecollcetion']]
+    ApiResource(
+        operations: [
+            new GetCollection(
+                normalizationContext: ['groups' => ['read:housecollcetion']]
+            ),
+            new Get(
+                normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
+            ),
+            new Post(
+                denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+            ),
+            new Patch(
+                denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+            ),
+            new Delete()
+        ]
     ),
-    Get(
-        normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'title' => SearchFilter::STRATEGY_PARTIAL,
+            'owner.id' => SearchFilter::STRATEGY_EXACT,
+            'address.city' => SearchFilter::STRATEGY_EXACT,
+            'address.country' => SearchFilter::STRATEGY_EXACT,
+            'status' => SearchFilter::STRATEGY_EXACT,
+        ]
     ),
-    Post(
-        denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+    ApiFilter(
+        RangeFilter::class,
+        properties: ['rooms', 'nbPerson', 'price']
     ),
-    Patch(
-        denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+    ApiFilter(
+        OrderFilter::class,
+        properties: ['createdAt', 'price']
     ),
-    Delete
+    ApiFilter(
+        DateFilter::class,
+        properties: ['reservations.fromDate', 'reservations.toDate']
+    )
 ]
-//#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial', 'owner' => 'exact'])]
 
 #[ORM\Entity(repositoryClass: HouseRepository::class)]
 class House
@@ -95,6 +123,10 @@ class House
      * )
      */
     private ?float $surface = null;
+
+    #[ORM\Column]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    private ?int $rooms = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house'])]
@@ -407,6 +439,18 @@ class House
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getRooms(): ?int
+    {
+        return $this->rooms;
+    }
+
+    public function setRooms(int $rooms): self
+    {
+        $this->rooms = $rooms;
 
         return $this;
     }

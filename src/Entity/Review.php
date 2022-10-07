@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
@@ -13,7 +15,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         normalizationContext: ['groups' => ['read:review']],
         denormalizationContext: ['groups' => ['write:review']],
-    )
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'user.id' => SearchFilter::STRATEGY_EXACT,
+            'house.id' => SearchFilter::STRATEGY_EXACT,
+        ]
+    ),
 ]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review

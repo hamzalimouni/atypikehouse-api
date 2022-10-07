@@ -2,15 +2,25 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProprietyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['read:property']],
-    denormalizationContext: ['groups' => ['write:property']],
-)]
+#[
+    ApiResource(
+        normalizationContext: ['groups' => ['read:property']],
+        denormalizationContext: ['groups' => ['write:property']],
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'category.name' => SearchFilter::STRATEGY_EXACT,
+        ]
+    )
+]
 #[ORM\Entity(repositoryClass: ProprietyRepository::class)]
 class Propriety
 {
