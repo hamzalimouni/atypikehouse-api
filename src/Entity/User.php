@@ -86,10 +86,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:user', 'write:user'])]
     private ?string $status = null;
 
-    #[ORM\Column]
-    #[Groups(['read:user'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
     #[Groups(['read:user'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
     private Collection $reservations;
@@ -114,6 +110,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: House::class)]
     #[Groups(['read:user'])]
     private Collection $houses;
+
+    #[ORM\Column]
+    #[Groups(['read:user', 'write:user'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
