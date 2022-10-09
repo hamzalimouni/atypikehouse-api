@@ -10,6 +10,7 @@ use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
@@ -36,28 +37,34 @@ class Reservation
 
     #[ORM\Column]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    #[Assert\NotBlank]
     private ?float $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $toDate = null;
 
     #[ORM\Column]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    #[Assert\NotBlank]
     private ?int $nbPersons = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:reservation', 'write:reservation'])]
+    #[Assert\NotNull]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    #[Assert\NotNull]
     private ?House $house = null;
 
     #[ORM\Column]

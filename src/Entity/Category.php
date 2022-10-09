@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
@@ -47,10 +48,12 @@ class Category
 
     #[ORM\Column(length: 128)]
     #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection'])]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column]
     #[Groups(['read:category', 'write:category', 'create:category', 'read:categorycollection'])]
+    #[Assert\NotBlank]
     private ?bool $status = null;
 
     #[ORM\Column]
@@ -59,10 +62,12 @@ class Category
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: House::class)]
     #[Groups(['read:category'])]
+    #[Assert\NotNull]
     private Collection $houses;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Propriety::class)]
     #[Groups(['read:category'])]
+    #[Assert\NotNull]
     private Collection $proprieties;
 
     public function __construct()

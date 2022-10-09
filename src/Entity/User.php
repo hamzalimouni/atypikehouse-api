@@ -30,60 +30,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    /**
-     * @Assert\Email(
-     * message = "Adresse email '{{ value }}' non valide.")
-     */
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
     private ?string $email = null;
 
     #[ORM\Column]
     #[Groups(['read:user', 'write:user'])]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     * @Assert\Length(
-     *      min = 8,
-     *      max = 32,
-     *      minMessage = "Votre mot de passe doit contenir au minimum {{ limit }} caractères",
-     *      maxMessage = "Votre mot de passe doit contenir au maximum {{ limit }} caractères"
-     * )
-     */
     #[ORM\Column]
     #[Groups(['write:user'])]
+    # @var string The hashed password
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Your password must be at least {{ limit }} characters long',
+        maxMessage: 'Your password cannot be longer than {{ limit }} characters',
+    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner votre prénom")
-     */
+    #[Assert\NotBlank]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner votre nom")
-     */
+    #[Assert\NotBlank]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user', 'read:reservation'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner votre numéro de téléphone")
-     */
+    #[Assert\NotBlank]
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['read:user', 'write:user'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner votre date de naissance")
-     */
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $birthday = null;
 
     #[ORM\Column(length: 32)]
     #[Groups(['read:user', 'write:user'])]
+    #[Assert\NotBlank]
     private ?string $status = null;
 
     #[Groups(['read:user'])]

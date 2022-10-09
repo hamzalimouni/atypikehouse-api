@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\EquipementRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     GetCollection(
@@ -39,10 +39,12 @@ class Equipement
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:equipment', 'write:equipment', 'read:house', 'read:equipmentcollection'])]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column]
     #[Groups(['read:equipment', 'write:equipment', 'read:equipmentcollection'])]
+    #[Assert\NotBlank]
     private ?bool $status = null;
 
     #[ORM\Column]

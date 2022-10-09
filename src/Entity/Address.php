@@ -11,10 +11,11 @@ use App\Repository\AddressRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        operations:[
+        operations: [
             new Post(),
             new Get()
         ],
@@ -33,30 +34,37 @@ class Address
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?string $address = null;
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?string $city = null;
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?string $state = null;
 
     #[ORM\Column]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?int $zipcode = null;
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?string $country = null;
 
     #[ORM\Column]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?float $longitude = null;
 
     #[ORM\Column]
     #[Groups(['read:address', 'write:address'])]
+    #[Assert\NotBlank]
     private ?float $latitude = null;
 
     public function getId(): ?int

@@ -74,62 +74,43 @@ class House
 
     #[ORM\Column(length: 255)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner le nom de l'hébergement")
-     */
+    #[Assert\NotBlank]
     private ?string $title = null;
 
     #[ORM\ManyToOne(inversedBy: 'houses')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:housecollcetion'])]
-    /**
-     * @Assert\NotNull(message="Veuillez renseignez la categorie à laquelle appartient votre hébergement")
-     */
+    #[Assert\NotNull]
     private ?Category $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner la description de cet hébergement")
-     */
+    #[Assert\NotBlank]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
-    /**
-     * @Assert\GreaterThan(
-     *     value = 0,
-     *     message ="Le prix doit etre superieur a 0"
-     * )
-     */
+    #[Assert\GreaterThan(value: 0)]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
-    /**
-     * @Assert\GreaterThan(
-     *     value = 0,
-     *     message ="Vous devez renseigner le nombre de voyageurs que peut accueillir l'hébergement"
-     * )
-     */
+    #[Assert\GreaterThan(value: 0)]
     private ?int $nbPerson = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
-    /**
-     * @Assert\GreaterThan(
-     *     value = 0,
-     *     message ="La surface doit etre renseignée"
-     * )
-     */
+    #[Assert\GreaterThan(value: 0)]
     private ?float $surface = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Assert\GreaterThan(value: 0)]
     private ?int $rooms = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house'])]
+    #[Assert\NotBlank]
     private ?bool $disponible = null;
 
     #[ORM\Column(length: 255)]
@@ -138,11 +119,13 @@ class House
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Assert\NotBlank]
     private ?string $status = null;
 
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class)]
     #[Groups(['read:house', 'write:house'])]
+    #[Assert\NotNull]
     private Collection $properties;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Reservation::class)]
@@ -152,14 +135,17 @@ class House
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Assert\NotNull]
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class)]
     #[Groups(['read:house'])]
+    #[Assert\NotNull]
     private Collection $reviews;
 
     #[ORM\ManyToMany(targetEntity: Equipement::class)]
     #[Groups(['read:house', 'write:house'])]
+    #[Assert\NotNull]
     private Collection $equipments;
 
     #[ORM\ManyToOne(inversedBy: 'houses')]

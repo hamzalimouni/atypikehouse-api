@@ -35,32 +35,24 @@ class Review
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups(['read:review', 'write:review', 'read:user'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner une note pour votre reservation")
-     */
+    #[Assert\NotBlank]
     private ?int $grade = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['read:review', 'write:review', 'read:user'])]
-    /**
-     * @Assert\NotBlank(message="Veuillez renseigner une description de ce que vous avez pensé du logement")
-     */
+    #[Assert\NotBlank]
     private ?string $comment = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:review', 'write:review'])]
-    /**
-     * @Assert\NotNull(message="Veuillez renseignez l'utilisateur")
-     */
+    #[Assert\NotNull]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:review', 'write:review', 'read:user'])]
-    /**
-     * @Assert\NotNull(message="Veuillez renseignez le logement")
-     */
+    #[Assert\NotNull]
     private ?House $house = null;
 
     #[ORM\Column]

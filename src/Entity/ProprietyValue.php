@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProprietyValueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
@@ -32,16 +33,19 @@ class ProprietyValue
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:propertyvalue', 'write:propertyvalue', 'read:house'])]
+    #[Assert\NotBlank]
     private ?string $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:propertyvalue', 'write:propertyvalue', 'read:house'])]
+    #[Assert\NotNull]
     private ?Propriety $propriety = null;
 
     #[ORM\ManyToOne(inversedBy: 'properties')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:propertyvalue', 'write:propertyvalue'])]
+    #[Assert\NotNull]
     private ?House $house = null;
 
     public function getId(): ?int
