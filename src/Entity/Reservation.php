@@ -19,21 +19,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        new Post(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Get(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
-        new GetCollection(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
-        new Patch(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
-        new Delete(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
+        operations: [
+            new Post(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Get(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+            new GetCollection(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+            new Patch(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+            new Delete(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+        ],
         normalizationContext: ['groups' => ['read:reservation']],
         denormalizationContext: ['groups' => ['write:reservation']],
     ),
@@ -93,7 +95,7 @@ class Reservation
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();   
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

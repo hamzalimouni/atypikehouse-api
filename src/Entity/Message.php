@@ -18,21 +18,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        new Post(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Get(
-            security: "object.sender == user or object.receiver == user",
-        ),
-        new GetCollection(
-            security: "object.sender == user or object.receiver == user",
-        ),
-        new Patch(
-            security: "object.sender == user or object.receiver == user",
-        ),
-        new Delete(
-            //security: "object.sender == user or object.receiver == user", 
-        ),
+        operations: [
+            new Post(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Get(
+                security: "object.sender == user or object.receiver == user",
+            ),
+            new GetCollection(
+                security: "object.sender == user or object.receiver == user",
+            ),
+            new Patch(
+                security: "object.sender == user or object.receiver == user",
+            ),
+            new Delete(
+                //security: "object.sender == user or object.receiver == user", 
+            )
+        ],
         normalizationContext: ['groups' => ['read:message']],
         denormalizationContext: ['groups' => ['write:message']],
     ),
@@ -78,6 +80,11 @@ class Message
     #[ORM\Column]
     #[Groups('read:message')]
     private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
 
     public function getId(): ?int

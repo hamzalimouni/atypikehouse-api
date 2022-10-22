@@ -17,21 +17,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        new Post(
-            security: "is_granted('ROLE_ADMIN')",
-        ),
-        new Get(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new GetCollection(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Patch(
-            security: "is_granted('ROLE_ADMIN')",
-        ),
-        new Delete(
-            security: "is_granted('ROLE_ADMIN')",
-        ),
+        operations: [
+            new Post(
+                security: "is_granted('ROLE_ADMIN')",
+            ),
+            new Get(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new GetCollection(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Patch(
+                security: "is_granted('ROLE_ADMIN')",
+            ),
+            new Delete(
+                security: "is_granted('ROLE_ADMIN')",
+            ),
+        ],
         normalizationContext: ['groups' => ['read:property']],
         denormalizationContext: ['groups' => ['write:property']],
     ),
@@ -83,7 +85,7 @@ class Propriety
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();   
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

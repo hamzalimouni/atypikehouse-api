@@ -18,17 +18,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        new Post(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Get(),
-        new GetCollection(),
-        new Patch(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
-        new Delete(
-            security: "is_granted('ROLE_ADMIN') or object.user = user",
-        ),
+        operations: [
+            new Post(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Get(),
+            new GetCollection(),
+            new Patch(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+            new Delete(
+                security: "is_granted('ROLE_ADMIN') or object.user = user",
+            ),
+        ],
         normalizationContext: ['groups' => ['read:review']],
         denormalizationContext: ['groups' => ['write:review']],
     ),
@@ -77,7 +79,7 @@ class Review
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();   
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

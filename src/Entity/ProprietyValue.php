@@ -17,17 +17,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
-        new Post(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Get(),
-        new GetCollection(),
-        new Patch(
-            security: "is_granted('ROLE_USER')",
-        ),
-        new Delete(
-            security: "is_granted('ROLE_USER')",
-        ),
+        operations: [
+            new Post(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Get(),
+            new GetCollection(),
+            new Patch(
+                security: "is_granted('ROLE_USER')",
+            ),
+            new Delete(
+                security: "is_granted('ROLE_USER')",
+            ),
+        ],
         normalizationContext: ['groups' => ['read:propertyvalue']],
         denormalizationContext: ['groups' => ['write:propertyvalue']],
     ),
