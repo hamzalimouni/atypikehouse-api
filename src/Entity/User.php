@@ -3,7 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Controller\MeController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,6 +20,29 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
+    operations: [
+        new Get(
+            security: "is_granted('ROLE_ADMIN') or object == user", 
+        ),
+        new Post(),
+        new Patch(
+            security: "is_granted('ROLE_USER') and object == user", 
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')", 
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['read:user:collection', 'read:address']],
+            security: "is_granted('ROLE_ADMIN')", 
+        ),
+        //new Post(name: 'login', routeName: 'api_login_check', denormalizationContext: ['groups' => ['user:login']]),
+        /*new Get(
+            name: 'me',
+            routeName: 'app_me',
+            uriTemplate: '/api/me',
+            controller: MeController::class,
+        ),*/
+    ],
     normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message', 'read:review']],
     denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review']],
 )]
@@ -26,22 +54,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('read:user', 'read:reservation', 'read:message', 'read:review')]
+    #[Groups('read:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection')]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'user:login'])]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['read:user', 'write:user'])]
+    #[Groups(['read:user', 'read:user:collection'])]
     private array $roles = [];
 
     #[ORM\Column]
-    #[Groups(['write:user'])]
+    #[Groups(['write:user', 'user:login'])]
     # @var string The hashed password
     #[Assert\Length(
         min: 2,
@@ -52,49 +80,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
     #[Assert\NotBlank]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
     #[Assert\NotBlank]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:user:collection'])]
     #[Assert\NotBlank]
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['read:user', 'write:user'])]
+    #[Groups(['read:user', 'write:user', 'read:user:collection'])]
     #[Assert\NotBlank]
     private ?\DateTimeInterface $birthday = null;
 
-    #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user'])]
-    #[Assert\NotBlank]
+    #[ORM\Column(length: 32, nullable: true)]
+    #[Groups(['read:user', 'read:user:collection'])]
     private ?string $status = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:user:collection'])]
+    private ?Address $address = null;
 
     #[Groups(['read:user'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
     private Collection $reservations;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:user', 'write:user', 'read:reservation'])]
-    private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
     #[Groups(['read:user'])]
     private Collection $reviews;
 
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
-    #[Groups(['read:user'])]
+    //#[Groups(['read:user'])]
     private Collection $sentmessages;
 
     #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Message::class)]
-    #[Groups(['read:user'])]
+    //#[Groups(['read:user'])]
     private Collection $receivedmessages;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: House::class)]
@@ -102,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $houses;
 
     #[ORM\Column]
-    #[Groups(['read:user', 'write:user'])]
+    #[Groups(['read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
@@ -113,6 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->sentmessages = new ArrayCollection();
         $this->receivedmessages = new ArrayCollection();
         $this->houses = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();    
     }
 
     public function getId(): ?int
@@ -235,7 +263,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isStatus(): ?string
     {
-        return $this->status;
+        $status = $this->status;
+        $status = 'NOT_VERIFIED';
+        return $status;
     }
 
     public function setStatus(string $status): self

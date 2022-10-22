@@ -15,18 +15,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     GetCollection(
+        //security: "is_granted('ROLE_ADMIN')",
         normalizationContext: ['groups' => ['read:equipmentcollection']],
     ),
-    Get(
-        normalizationContext: ['groups' => ['read:equipment']],
-    ),
     Post(
+        security: "is_granted('ROLE_ADMIN')",
         denormalizationContext: ['groups' => ['write:equipment']],
     ),
     Patch(
+        security: "is_granted('ROLE_ADMIN')",
         denormalizationContext: ['groups' => ['write:equipment']],
     ),
-    Delete()
+    Delete(
+        security: "is_granted('ROLE_ADMIN')",
+    )
 ]
 #[ORM\Entity(repositoryClass: EquipementRepository::class)]
 class Equipement
@@ -50,6 +52,11 @@ class Equipement
     #[ORM\Column]
     #[Groups(['read:equipment'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();   
+    }
 
     public function getId(): ?int
     {

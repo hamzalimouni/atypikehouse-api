@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         operations: [
             new Post(
+                security: "is_granted('ROLE_ADMIN')",
                 denormalizationContext: ['groups' => ['write:category']],
             ),
             new Get(
@@ -28,9 +29,12 @@ use Symfony\Component\Validator\Constraints as Assert;
                 normalizationContext: ['groups' => ['read:categorycollection', 'read:property']],
             ),
             new Patch(
+                security: "is_granted('ROLE_ADMIN') or object == user",
                 denormalizationContext: ['groups' => ['write:category']],
             ),
-            new Delete()
+            new Delete(
+                security: "is_granted('ROLE_ADMIN') or object == user"
+            )
         ]
     )
 ]
@@ -74,6 +78,7 @@ class Category
     {
         $this->houses = new ArrayCollection();
         $this->proprieties = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();   
     }
 
     public function getId(): ?int

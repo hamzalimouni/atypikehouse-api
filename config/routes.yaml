@@ -1,6 +1,10 @@
 controllers:
-    resource: ../src/Controller/
-    type: attribute
+  resource: ../src/Controller/
+  type: attribute
 
 api_login_check:
-    path: /api/login
+  path: /api/login
+
+app_me:
+  path: /api/me
+  controller: App\Controller\MeController

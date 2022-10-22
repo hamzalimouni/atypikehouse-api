@@ -6,6 +6,11 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +19,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
+        new Post(
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN') or object.user = user",
+        ),
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN') or object.user = user",
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN') or object.user = user",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or object.user = user",
+        ),
         normalizationContext: ['groups' => ['read:reservation']],
         denormalizationContext: ['groups' => ['write:reservation']],
     ),
@@ -70,6 +90,11 @@ class Reservation
     #[ORM\Column]
     #[Groups(['read:reservation', 'read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();   
+    }
 
     public function getId(): ?int
     {

@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[
     ApiResource(
         operations: [
-            new Post(),
-            new Get()
+           /* new Post(),
+            new Get()*/
         ],
         normalizationContext: ['groups' => ['read:address']],
         denormalizationContext: ['groups' => ['write:address']],

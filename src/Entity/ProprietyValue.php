@@ -5,6 +5,11 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use App\Repository\ProprietyValueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -12,6 +17,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
+        new Post(
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Get(),
+        new GetCollection(),
+        new Patch(
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER')",
+        ),
         normalizationContext: ['groups' => ['read:propertyvalue']],
         denormalizationContext: ['groups' => ['write:propertyvalue']],
     ),

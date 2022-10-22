@@ -31,12 +31,16 @@ use Symfony\Component\Validator\Constraints as Assert;
                 normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
             ),
             new Post(
+                security: "is_granted('ROLE_USER')",
                 denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
             ),
             new Patch(
+                security: "is_granted('ROLE_ADMIN') or object.owner == user",
                 denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
             ),
-            new Delete()
+            new Delete(
+                security: "is_granted('ROLE_ADMIN') or object.owner == user",
+            )
         ]
     ),
     ApiFilter(
@@ -47,6 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             'address.city' => SearchFilter::STRATEGY_EXACT,
             'address.country' => SearchFilter::STRATEGY_EXACT,
             'status' => SearchFilter::STRATEGY_EXACT,
+            //'category.id' => SearchFilter::STRATEGY_EXACT,
         ]
     ),
     ApiFilter(
@@ -163,6 +168,7 @@ class House
         $this->reservations = new ArrayCollection();
         $this->reviews = new ArrayCollection();
         $this->equipments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();   
     }
 
     public function getId(): ?int

@@ -6,6 +6,10 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +18,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[
     ApiResource(
+        new Post(
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Get(
+            security: "object.sender == user or object.receiver == user",
+        ),
+        new GetCollection(
+            security: "object.sender == user or object.receiver == user",
+        ),
+        new Patch(
+            security: "object.sender == user or object.receiver == user",
+        ),
+        new Delete(
+            //security: "object.sender == user or object.receiver == user", 
+        ),
         normalizationContext: ['groups' => ['read:message']],
         denormalizationContext: ['groups' => ['write:message']],
     ),
