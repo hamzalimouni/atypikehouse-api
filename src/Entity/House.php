@@ -118,9 +118,9 @@ class House
     #[Assert\NotBlank]
     private ?bool $disponible = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
-    private ?array $photos = null;
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    private Collection $images;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
@@ -168,7 +168,8 @@ class House
         $this->reservations = new ArrayCollection();
         $this->reviews = new ArrayCollection();
         $this->equipments = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();   
+        $this->createdAt = new \DateTimeImmutable();
+        $this->images = new ArrayCollection();   
     }
 
     public function getId(): ?int
@@ -244,18 +245,6 @@ class House
     public function setDisponible(bool $disponible): self
     {
         $this->disponible = $disponible;
-
-        return $this;
-    }
-
-    public function getPhotos(): ?array
-    {
-        return $this->photos;
-    }
-
-    public function setPhotos(array $photos): self
-    {
-        $this->photos = $photos;
 
         return $this;
     }
@@ -443,6 +432,36 @@ class House
     public function setRooms(int $rooms): self
     {
         $this->rooms = $rooms;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setHouse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getHouse() === $this) {
+                $image->setHouse(null);
+            }
+        }
 
         return $this;
     }

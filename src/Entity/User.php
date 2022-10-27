@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Controller\MeController;
+use App\Controller\RegisterController;
+use App\Controller\UserUpdateController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,26 +24,33 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Get(
-            security: "is_granted('ROLE_ADMIN') or object == user", 
+            security: "is_granted('ROLE_ADMIN') or object == user",
         ),
-        new Post(),
+        //new Post(),
         new Patch(
-            security: "is_granted('ROLE_USER') and object == user", 
+            security: "is_granted('ROLE_USER') and object == user",
+            name: 'update',
+            uriTemplate: '/users/{id}/update',
+            controller: UserUpdateController::class
         ),
         new Delete(
-            security: "is_granted('ROLE_ADMIN')", 
+            security: "is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
             normalizationContext: ['groups' => ['read:user:collection', 'read:address']],
-            security: "is_granted('ROLE_ADMIN')", 
+            security: "is_granted('ROLE_ADMIN')",
         ),
+        new Post(
+            name: 'register',
+            uriTemplate: '/register',
+            controller: RegisterController::class
+        )
         //new Post(name: 'login', routeName: 'api_login_check', denormalizationContext: ['groups' => ['user:login']]),
-        /*new Get(
-            name: 'me',
-            routeName: 'app_me',
-            uriTemplate: '/api/me',
-            controller: MeController::class,
-        ),*/
+        // new Get(
+        //     name: 'me',
+        //     uriTemplate: '/me',
+        //     controller: MeController::class,
+        // ),
     ],
     normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message', 'read:review']],
     denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review']],
@@ -72,10 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['write:user', 'user:login'])]
     # @var string The hashed password
     #[Assert\Length(
-        min: 2,
-        max: 50,
-        minMessage: 'Your password must be at least {{ limit }} characters long',
-        maxMessage: 'Your password cannot be longer than {{ limit }} characters',
+        min: 8,
     )]
     private ?string $password = null;
 
@@ -140,7 +146,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->sentmessages = new ArrayCollection();
         $this->receivedmessages = new ArrayCollection();
         $this->houses = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();    
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
