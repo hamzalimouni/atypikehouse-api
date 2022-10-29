@@ -2,12 +2,25 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
 use App\Repository\DisponibilityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: DisponibilityRepository::class)]
+#[
+    ApiResource(
+        operations: [
+            new Post(),
+            new GetCollection(),
+            new Get(),
+        ]
+    )
+]
 class Disponibility
 {
     #[ORM\Id]

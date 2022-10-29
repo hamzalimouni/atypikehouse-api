@@ -68,8 +68,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     ApiFilter(
         DateFilter::class,
-        properties: ['reservations.fromDate', 'reservations.toDate']
-    )
+        properties: ['reservations.fromDate', 'reservations.toDate', 'disponibilities.date']
+    ),
 ]
 
 #[ORM\Entity(repositoryClass: HouseRepository::class)]

@@ -5,6 +5,7 @@ namespace App\Controller;
 use ApiPlatform\Validator\ValidatorInterface;
 use App\Entity\Address;
 use App\Entity\Category;
+use App\Entity\Disponibility;
 use App\Entity\Equipement;
 use App\Entity\House;
 use App\Entity\Image;
@@ -52,6 +53,13 @@ class HouseController extends AbstractController
             ->setStatus("NEW_LISTING")
             ->setCategory($this->categoryRepository->findBy(['name' => $request->request->get('category')])[0]);
 
+
+        foreach ($request->request->all('disponibilities') as $indispo) {
+            $d = new Disponibility();
+            $d->setDate(new \DateTime($indispo));
+            $house->addDisponibility($d);
+            $this->entityManager->persist($d);
+        }
 
         foreach ($request->request->all('equipments') as $equipment) {
             $house->addEquipment(
