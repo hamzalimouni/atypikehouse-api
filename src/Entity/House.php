@@ -118,11 +118,6 @@ class House
     #[Assert\GreaterThan(value: 0)]
     private ?int $rooms = null;
 
-    #[ORM\Column]
-    #[Groups(['read:house', 'write:house'])]
-    #[Assert\NotBlank]
-    private ?bool $disponible = null;
-
     #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     #[Assert\NotNull]
@@ -133,6 +128,9 @@ class House
     #[Assert\NotBlank]
     private ?string $status = null;
 
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class)]
+    #[Groups(['read:house', 'write:house'])]
+    private Collection $disponibilities;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class)]
     #[Groups(['read:house', 'write:house'])]
@@ -176,6 +174,7 @@ class House
         $this->equipments = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->images = new ArrayCollection();
+        $this->disponibilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -239,18 +238,6 @@ class House
     public function setSurface(float $surface): self
     {
         $this->surface = $surface;
-
-        return $this;
-    }
-
-    public function isDisponible(): ?bool
-    {
-        return $this->disponible;
-    }
-
-    public function setDisponible(bool $disponible): self
-    {
-        $this->disponible = $disponible;
 
         return $this;
     }
@@ -466,6 +453,36 @@ class House
             // set the owning side to null (unless already changed)
             if ($image->getHouse() === $this) {
                 $image->setHouse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Disponibility>
+     */
+    public function getDisponibilities(): Collection
+    {
+        return $this->disponibilities;
+    }
+
+    public function addDisponibility(Disponibility $disponibility): self
+    {
+        if (!$this->disponibilities->contains($disponibility)) {
+            $this->disponibilities->add($disponibility);
+            $disponibility->setHouse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDisponibility(Disponibility $disponibility): self
+    {
+        if ($this->disponibilities->removeElement($disponibility)) {
+            // set the owning side to null (unless already changed)
+            if ($disponibility->getHouse() === $this) {
+                $disponibility->setHouse(null);
             }
         }
 

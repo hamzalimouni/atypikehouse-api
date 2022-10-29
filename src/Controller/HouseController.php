@@ -49,7 +49,6 @@ class HouseController extends AbstractController
             ->setRooms($request->request->get('rooms'))
             ->setAddress($address)
             ->setOwner($this->security->getUser())
-            ->setDisponible(true)
             ->setStatus("NEW_LISTING")
             ->setCategory($this->categoryRepository->findBy(['name' => $request->request->get('category')])[0]);
 
