@@ -2,11 +2,31 @@
 
 namespace App\Entity;
 
-use App\Repository\ImageRepository;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\Controller\CreateMediaObjectAction;
+use App\Controller\ImageController;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ApiResource(
+    // normalizationContext: ['groups' => ['media_object:read']], 
+    // types: ['https://schema.org/MediaObject'],
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post()
+    ]
+)]
 class Image
 {
     #[ORM\Id]
@@ -17,6 +37,14 @@ class Image
     #[ORM\Column(length: 255)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     private ?string $fileName = null;
+
+    #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "fileName")]
+    #[Assert\NotNull]
+    public ?File $file = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'images')]
     #[ORM\JoinColumn(nullable: false)]
@@ -49,5 +77,29 @@ class Image
         $this->House = $House;
 
         return $this;
+    }
+
+    public function setFile(?File $file): self
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFilePath(?string $filePath): self
+    {
+        $this->filePath = $filePath;
+
+        return $this;
+    }
+
+    public function getFilePath(): ?string
+    {
+        return $this->filePath;
     }
 }

@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\HouseController;
 use App\Repository\HouseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,8 +32,11 @@ use Symfony\Component\Validator\Constraints as Assert;
                 normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
             ),
             new Post(
+                controller: HouseController::class,
+                deserialize: false,
                 security: "is_granted('ROLE_USER')",
                 denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
+                //inputFormats: ['multipart' => ['multipart/form-data']]
             ),
             new Patch(
                 security: "is_granted('ROLE_ADMIN') or object.owner == user",
@@ -96,6 +100,7 @@ class House
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:reservation', 'read:user', 'read:category', 'read:housecollcetion'])]
     #[Assert\GreaterThan(value: 0)]
+    #[Assert\NotBlank]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
@@ -120,6 +125,7 @@ class House
 
     #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Assert\NotNull]
     private Collection $images;
 
     #[ORM\Column]
@@ -169,7 +175,7 @@ class House
         $this->reviews = new ArrayCollection();
         $this->equipments = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
-        $this->images = new ArrayCollection();   
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
