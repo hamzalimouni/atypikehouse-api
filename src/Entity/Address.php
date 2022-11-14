@@ -16,9 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[
     ApiResource(
         operations: [
-           /* new Post(),
-            new Get()*/
-        ],
+            /* new Post(),
+            new Get()*/],
         normalizationContext: ['groups' => ['read:address']],
         denormalizationContext: ['groups' => ['write:address']],
     ),
@@ -42,29 +41,22 @@ class Address
     #[Assert\NotBlank]
     private ?string $city = null;
 
-    #[ORM\Column(length: 64)]
-    #[Groups(['read:address', 'write:address'])]
-    #[Assert\NotBlank]
-    private ?string $state = null;
-
     #[ORM\Column]
     #[Groups(['read:address', 'write:address'])]
     #[Assert\NotBlank]
-    private ?int $zipcode = null;
+    private ?string $zipcode = null;
 
     #[ORM\Column(length: 64)]
     #[Groups(['read:address', 'write:address'])]
     #[Assert\NotBlank]
     private ?string $country = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['read:address', 'write:address'])]
-    #[Assert\NotBlank]
     private ?float $longitude = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['read:address', 'write:address'])]
-    #[Assert\NotBlank]
     private ?float $latitude = null;
 
     public function getId(): ?int
@@ -96,24 +88,12 @@ class Address
         return $this;
     }
 
-    public function getState(): ?string
-    {
-        return $this->state;
-    }
-
-    public function setState(string $state): self
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    public function getZipcode(): ?int
+    public function getZipcode(): ?string
     {
         return $this->zipcode;
     }
 
-    public function setZipcode(int $zipcode): self
+    public function setZipcode(string $zipcode): self
     {
         $this->zipcode = $zipcode;
 

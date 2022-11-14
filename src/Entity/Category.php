@@ -47,17 +47,16 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:category', 'read:category', 'read:categorycollection'])]
+    #[Groups(['read:category', 'read:category', 'read:categorycollection', 'read:property'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 128)]
-    #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection'])]
+    #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection', 'read:property'])]
     #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column]
     #[Groups(['read:category', 'write:category', 'create:category', 'read:categorycollection'])]
-    #[Assert\NotBlank]
     private ?bool $status = null;
 
     #[ORM\Column]
@@ -78,7 +77,8 @@ class Category
     {
         $this->houses = new ArrayCollection();
         $this->proprieties = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();   
+        $this->createdAt = new \DateTimeImmutable();
+        $this->status = 0;
     }
 
     public function getId(): ?int

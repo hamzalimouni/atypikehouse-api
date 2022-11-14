@@ -46,7 +46,6 @@ class Equipement
 
     #[ORM\Column]
     #[Groups(['read:equipment', 'write:equipment', 'read:equipmentcollection'])]
-    #[Assert\NotBlank]
     private ?bool $status = null;
 
     #[ORM\Column]
@@ -56,6 +55,7 @@ class Equipement
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();   
+        $this->status = 0;
     }
 
     public function getId(): ?int

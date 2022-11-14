@@ -118,6 +118,11 @@ class House
     #[Assert\GreaterThan(value: 0)]
     private ?int $rooms = null;
 
+    #[ORM\Column]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Assert\GreaterThan(value: 0)]
+    private ?int $beds = null;
+
     #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     #[Assert\NotNull]
@@ -485,6 +490,18 @@ class House
                 $disponibility->setHouse(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBeds(): ?int
+    {
+        return $this->beds;
+    }
+
+    public function setBeds(int $beds): self
+    {
+        $this->beds = $beds;
 
         return $this;
     }

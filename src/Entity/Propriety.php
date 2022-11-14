@@ -21,12 +21,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             new Post(
                 security: "is_granted('ROLE_ADMIN')",
             ),
-            new Get(
-                security: "is_granted('ROLE_USER')",
-            ),
-            new GetCollection(
-                security: "is_granted('ROLE_USER')",
-            ),
+            new Get(),
+            new GetCollection(),
             new Patch(
                 security: "is_granted('ROLE_ADMIN')",
             ),
@@ -34,13 +30,13 @@ use Symfony\Component\Validator\Constraints as Assert;
                 security: "is_granted('ROLE_ADMIN')",
             ),
         ],
-        normalizationContext: ['groups' => ['read:property']],
-        denormalizationContext: ['groups' => ['write:property']],
+        normalizationContext: ['groups' => ['read:property', 'read:category']],
+        denormalizationContext: ['groups' => ['write:property', 'write:category']],
     ),
     ApiFilter(
         SearchFilter::class,
         properties: [
-            'category.name' => SearchFilter::STRATEGY_EXACT,
+            'category.id' => SearchFilter::STRATEGY_EXACT,
         ]
     )
 ]
@@ -65,13 +61,7 @@ class Propriety
 
     #[ORM\Column]
     #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
-    #[Assert\NotBlank]
     private ?bool $isRequired = null;
-
-    #[ORM\Column]
-    #[Groups(['read:property', 'write:property', 'read:propertyvalue'])]
-    #[Assert\NotBlank]
-    private ?bool $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'proprieties')]
     #[ORM\JoinColumn(nullable: false)]
@@ -86,6 +76,7 @@ class Propriety
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->isRequired = 0;
     }
 
     public function getId(): ?int
@@ -125,18 +116,6 @@ class Propriety
     public function setIsRequired(bool $isRequired): self
     {
         $this->isRequired = $isRequired;
-
-        return $this;
-    }
-
-    public function isStatus(): ?bool
-    {
-        return $this->status;
-    }
-
-    public function setStatus(bool $status): self
-    {
-        $this->status = $status;
 
         return $this;
     }

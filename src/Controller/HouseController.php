@@ -36,7 +36,6 @@ class HouseController extends AbstractController
         $address = new Address();
         $address->setAddress($request->request->get('address'))
             ->setCity($request->request->get('city'))
-            ->setState($request->request->get('state'))
             ->setZipcode($request->request->get('zipcode'))
             ->setCountry($request->request->get('country'))
             ->setLongitude($request->request->get('longitude') ?: 0)

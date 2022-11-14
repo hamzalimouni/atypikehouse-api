@@ -29,8 +29,16 @@ class UserUpdateController extends AbstractController
     public function __invoke(User $user)
     {
         $this->validator->validate($user);
-        $passWord = $this->passwordEncoder->hashPassword($user, $user->getPassword());
-        $user->setPassword($passWord);
+        //print($user->getPassword());
+        if (strlen($user->getPassword()) < 15) {
+            $passWord = $this->passwordEncoder->hashPassword($user, $user->getPassword());
+            $user->setPassword($passWord);
+        }
         return $user;
     }
+
+    // public function verify(User $user, string $plainPassword): bool
+    // {
+    //     return $this->passwordEncoder->isPasswordValid($user, $plainPassword);
+    // }
 }
