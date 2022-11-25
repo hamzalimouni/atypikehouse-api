@@ -133,7 +133,7 @@ class House
     #[Assert\NotBlank]
     private ?string $status = null;
 
-    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class)]
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class, cascade: ['persist', 'remove'])]
     #[Groups(['read:house', 'write:house'])]
     private Collection $disponibilities;
 
@@ -165,7 +165,7 @@ class House
     #[ORM\ManyToOne(inversedBy: 'houses')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
-    private ?User $owner = null;
+    public ?User $owner = null;
 
     #[ORM\Column]
     #[Groups(['read:house', 'read:reservation'])]

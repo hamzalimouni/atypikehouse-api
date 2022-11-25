@@ -47,11 +47,11 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:category', 'read:category', 'read:categorycollection', 'read:property'])]
+    #[Groups(['read:category', 'read:category', 'read:categorycollection', 'read:property', 'read:house'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 128)]
-    #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection', 'read:property'])]
+    #[Groups(['read:category', 'write:category', 'read:category', 'create:category', 'read:categorycollection', 'read:property', 'read:house', 'read:housecollcetion'])]
     #[Assert\NotBlank]
     private ?string $name = null;
 

@@ -25,14 +25,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             new Get(),
             new GetCollection(),
             new Patch(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
+                security: "is_granted('ROLE_ADMIN') or object.user == user",
             ),
             new Delete(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
+                security: "is_granted('ROLE_ADMIN') or object.user == user",
             ),
         ],
         normalizationContext: ['groups' => ['read:review']],
-        denormalizationContext: ['groups' => ['write:review']],
+        denormalizationContext: ['groups' => ['write:review', 'write:user', 'write:house']],
     ),
     ApiFilter(
         SearchFilter::class,
@@ -63,7 +63,7 @@ class Review
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:review', 'write:review'])]
+    #[Groups(['read:review', 'write:review', 'write:user', 'read:user'])]
     #[Assert\NotNull]
     private ?User $user = null;
 

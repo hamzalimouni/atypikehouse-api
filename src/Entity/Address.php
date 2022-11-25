@@ -37,7 +37,7 @@ class Address
     private ?string $address = null;
 
     #[ORM\Column(length: 64)]
-    #[Groups(['read:address', 'write:address'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion'])]
     #[Assert\NotBlank]
     private ?string $city = null;
 
@@ -47,16 +47,16 @@ class Address
     private ?string $zipcode = null;
 
     #[ORM\Column(length: 64)]
-    #[Groups(['read:address', 'write:address'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion'])]
     #[Assert\NotBlank]
     private ?string $country = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read:address', 'write:address'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion'])]
     private ?float $longitude = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read:address', 'write:address'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion'])]
     private ?float $latitude = null;
 
     public function getId(): ?int
