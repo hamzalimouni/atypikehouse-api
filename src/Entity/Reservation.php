@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
+use App\Controller\BookingController;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,20 +22,22 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         operations: [
             new Post(
+                controller: BookingController::class,
+                deserialize: false,
                 security: "is_granted('ROLE_USER')",
             ),
             new Get(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
+                security: "is_granted('ROLE_ADMIN') or object.user == user",
             ),
             new GetCollection(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
+                security: "is_granted('ROLE_USER')",
             ),
             new Patch(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
+                security: "is_granted('ROLE_ADMIN') or object.getHouse().owner == user",
             ),
-            new Delete(
-                security: "is_granted('ROLE_ADMIN') or object.user = user",
-            ),
+            // new Delete(
+            //     security: "is_granted('ROLE_ADMIN') or object.user == user",
+            // ),
         ],
         normalizationContext: ['groups' => ['read:reservation']],
         denormalizationContext: ['groups' => ['write:reservation']],
@@ -44,6 +47,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         properties: [
             'user.id' => SearchFilter::STRATEGY_EXACT,
             'house.id' => SearchFilter::STRATEGY_EXACT,
+            'status' => SearchFilter::STRATEGY_EXACT,
         ]
     ),
     ApiFilter(OrderFilter::class, properties: ['createdAt', 'fromDate', 'toDate'])
@@ -81,7 +85,7 @@ class Reservation
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:reservation', 'write:reservation'])]
     #[Assert\NotNull]
-    private ?User $user = null;
+    public ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
@@ -92,6 +96,10 @@ class Reservation
     #[ORM\Column]
     #[Groups(['read:reservation', 'read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['read:reservation', 'write:reservation', 'read:user'])]
+    private ?string $status = null;
 
     public function __construct()
     {
@@ -183,6 +191,18 @@ class Reservation
     public function setNbPersons(int $nbPersons): self
     {
         $this->nbPersons = $nbPersons;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

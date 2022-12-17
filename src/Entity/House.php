@@ -29,6 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                 normalizationContext: ['groups' => ['read:housecollcetion']]
             ),
             new Get(
+                // security: "object.status == 'APPROVED'",
+                controller: HouseController::class,
                 normalizationContext: ['groups' => ['read:house', 'read:address', 'read:review', 'read:reservation']],
             ),
             new Post(
@@ -104,7 +106,7 @@ class House
     private ?float $price = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\GreaterThan(value: 0)]
     private ?int $nbPerson = null;
 
@@ -114,24 +116,24 @@ class House
     private ?float $surface = null;
 
     #[ORM\Column]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\GreaterThan(value: 0)]
     private ?int $rooms = null;
 
     #[ORM\Column]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\GreaterThan(value: 0)]
     private ?int $beds = null;
 
     #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\NotNull]
     private Collection $images;
 
     #[ORM\Column]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
     #[Assert\NotBlank]
-    private ?string $status = null;
+    public ?string $status = null;
 
     #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class, cascade: ['persist', 'remove'])]
     #[Groups(['read:house', 'write:house'])]
@@ -148,12 +150,12 @@ class House
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\NotNull]
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class)]
-    #[Groups(['read:house'])]
+    #[Groups(['read:house', 'read:housecollcetion'])]
     #[Assert\NotNull]
     private Collection $reviews;
 

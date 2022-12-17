@@ -35,7 +35,7 @@ class Image
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     private ?string $fileName = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "fileName")]
@@ -43,7 +43,7 @@ class Image
     public ?File $file = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read:house', 'write:house', 'read:housecollcetion'])]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'images')]

@@ -52,7 +52,7 @@ class Review
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups(['read:review', 'write:review', 'read:user'])]
+    #[Groups(['read:review', 'write:review', 'read:user', 'read:housecollcetion'])]
     #[Assert\NotBlank]
     private ?int $grade = null;
 

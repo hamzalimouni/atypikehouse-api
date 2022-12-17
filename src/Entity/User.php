@@ -100,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['read:user', 'write:user', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:user:collection', 'read:reservation'])]
     #[Assert\NotBlank]
     private ?\DateTimeInterface $birthday = null;
 
@@ -137,6 +137,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:user'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Notification::class)]
+    private Collection $notifications;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -146,6 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->receivedmessages = new ArrayCollection();
         $this->houses = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->notifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -448,6 +452,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($house->getOwner() === $this) {
                 $house->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): self
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUserId() === $this) {
+                $notification->setUserId(null);
             }
         }
 
