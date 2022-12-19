@@ -33,6 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 security: "is_granted('ROLE_USER')",
             ),
             new Patch(
+                controller: BookingController::class,
                 security: "is_granted('ROLE_ADMIN') or object.getHouse().owner == user",
             ),
             // new Delete(

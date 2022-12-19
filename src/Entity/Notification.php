@@ -2,12 +2,28 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\GetCollection;
+use App\Controller\NotificationController;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-#[ApiResource]
+#[
+    ApiResource(
+        operations: [
+            new GetCollection(
+                controller: NotificationController::class,
+                security: "is_granted('ROLE_USER')",
+            ),
+        ],
+        normalizationContext: ['groups' => ['read:message']],
+        denormalizationContext: ['groups' => ['write:message']],
+    ),
+]
+
 class Notification
 {
     #[ORM\Id]
@@ -22,14 +38,17 @@ class Notification
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'notifications')]
-    private ?User $user_id = null;
+    private ?User $user = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+    #[ORM\Column]
+    private ?int $data = null;
+
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -63,12 +82,12 @@ class Notification
 
     public function getUserId(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): self
+    public function setUserId(?User $user): self
     {
-        $this->user_id = $user_id;
+        $this->user = $user;
 
         return $this;
     }
@@ -81,6 +100,18 @@ class Notification
     public function setCreatedAt(\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getData(): ?int
+    {
+        return $this->data;
+    }
+
+    public function setData(int $data): self
+    {
+        $this->data = $data;
 
         return $this;
     }

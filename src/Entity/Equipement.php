@@ -8,6 +8,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\EquipmentController;
+use App\Controller\NotificationController;
 use App\Repository\EquipementRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -19,14 +21,17 @@ use Symfony\Component\Validator\Constraints as Assert;
         normalizationContext: ['groups' => ['read:equipmentcollection']],
     ),
     Post(
+        controller: EquipmentController::class,
         security: "is_granted('ROLE_ADMIN')",
         denormalizationContext: ['groups' => ['write:equipment']],
     ),
     Patch(
+        controller: EquipmentController::class,
         security: "is_granted('ROLE_ADMIN')",
         denormalizationContext: ['groups' => ['write:equipment']],
     ),
     Delete(
+        controller: EquipmentController::class,
         security: "is_granted('ROLE_ADMIN')",
     )
 ]

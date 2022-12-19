@@ -39,28 +39,27 @@ class NotificationRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Notification[] Returns an array of Notification objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('n')
-//            ->andWhere('n.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('n.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Notification[] Returns an array of Notification objects
+     */
+    public function findUserNotifications($user): array
+    {
+        return $this->createQueryBuilder('n')
+            ->andWhere('( n.user = :user OR n.user is null ) AND n.created_at > :date')
+            ->setParameter('user', $user->getId())
+            ->setParameter('date', $user->getCreatedAt())
+            ->orderBy('n.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?Notification
-//    {
-//        return $this->createQueryBuilder('n')
-//            ->andWhere('n.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?Notification
+    //    {
+    //        return $this->createQueryBuilder('n')
+    //            ->andWhere('n.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

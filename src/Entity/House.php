@@ -41,6 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 //inputFormats: ['multipart' => ['multipart/form-data']]
             ),
             new Patch(
+                controller: HouseController::class,
                 security: "is_granted('ROLE_ADMIN') or object.owner == user",
                 denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
             ),

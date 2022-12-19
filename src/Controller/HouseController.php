@@ -9,11 +9,13 @@ use App\Entity\Disponibility;
 use App\Entity\Equipement;
 use App\Entity\House;
 use App\Entity\Image;
+use App\Entity\Notification;
 use App\Entity\Propriety;
 use App\Entity\ProprietyValue;
 use App\Repository\CategoryRepository;
 use App\Repository\EquipementRepository;
 use App\Repository\ProprietyRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +40,7 @@ class HouseController extends AbstractController
 
     public function __invoke(Request $request): House
     {
-        if ($request->isMethod('post')) {
+        if ($request->isMethod('POST')) {
             $adr = json_decode($request->request->get('address'));
             $address = new Address();
             $address->setAddress($adr->address)
@@ -98,13 +100,37 @@ class HouseController extends AbstractController
                 $this->entityManager->persist($image);
             }
             return $house;
-        } else if ($request->isMethod('get')) {
+        } else if ($request->isMethod('GET')) {
             $house = $request->get('data');
             if ($house?->status == "APPROVED" || $house?->owner === $this->security->getUser() || $this->security->getUser() && in_array('ROLE_ADMIN', $this->security->getUser()?->getRoles(), true)) {
                 return $house;
             } else {
                 throw new AccessDeniedHttpException('Access denied');
             }
+        } else if ($request->isMethod('PATCH')) {
+            $house = $request->get('data');
+
+            if ($this->security->getUser() && in_array('ROLE_ADMIN', $this->security->getUser()?->getRoles(), true)) {
+                $notification = new Notification();
+                $notification->setUserId($house->getOwner());
+                if ($house?->status == "APPROVED") {
+                    $notification->setType('ANNONCE_APPROVED');
+                    $notification->setContent('Votre annonce a été acceptée par notre équipe.');
+                } else if ($house?->status == "REJECTED") {
+                    $notification->setType('ANNONCE_REJECTED');
+                    $notification->setContent('Votre annonce a été refusée par notre équipe.');
+                }
+                $notification->setCreatedAt(new DateTimeImmutable());
+                $notification->setData($house->getId());
+                $this->entityManager->persist($notification);
+            }
+
+            return $house;
+            // if ($house?->status == "APPROVED" || $house?->owner === $this->security->getUser() || $this->security->getUser() && in_array('ROLE_ADMIN', $this->security->getUser()?->getRoles(), true)) {
+            //     return $house;
+            // } else {
+            //     throw new AccessDeniedHttpException('Access denied');
+            // }
         }
     }
 }

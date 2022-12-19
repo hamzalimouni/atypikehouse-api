@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
+use App\Controller\ProprietyController;
 use App\Repository\ProprietyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -19,14 +20,17 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         operations: [
             new Post(
+                controller: ProprietyController::class,
                 security: "is_granted('ROLE_ADMIN')",
             ),
             new Get(),
             new GetCollection(),
             new Patch(
+                controller: ProprietyController::class,
                 security: "is_granted('ROLE_ADMIN')",
             ),
             new Delete(
+                controller: ProprietyController::class,
                 security: "is_granted('ROLE_ADMIN')",
             ),
         ],
