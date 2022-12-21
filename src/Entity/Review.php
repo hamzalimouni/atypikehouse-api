@@ -25,10 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             new Get(),
             new GetCollection(),
             new Patch(
-                security: "is_granted('ROLE_ADMIN') or object.user == user",
+                security: "is_granted('ROLE_ADMIN') or object.getUser() == user",
             ),
             new Delete(
-                security: "is_granted('ROLE_ADMIN') or object.user == user",
+                security: "is_granted('ROLE_ADMIN') or object.getUser() == user",
             ),
         ],
         normalizationContext: ['groups' => ['read:review']],

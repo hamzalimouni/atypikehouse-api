@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
+use App\Controller\MessageController;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,13 +21,16 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         operations: [
             new Post(
+                controller: MessageController::class,
                 security: "is_granted('ROLE_USER')",
             ),
             new Get(
-                security: "object.sender == user or object.receiver == user",
+                controller: MessageController::class,
+                security: "is_granted('ROLE_USER')",
             ),
             new GetCollection(
-                security: "object.sender == user or object.receiver == user",
+                controller: MessageController::class,
+                security: "is_granted('ROLE_USER')",
             ),
             new Patch(
                 security: "object.sender == user or object.receiver == user",
@@ -36,15 +40,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             )
         ],
         normalizationContext: ['groups' => ['read:message']],
-        denormalizationContext: ['groups' => ['write:message']],
+        denormalizationContext: ['groups' => ['write:message','write:user']],
     ),
-    ApiFilter(
-        SearchFilter::class,
-        properties: [
-            'sender.id' => SearchFilter::STRATEGY_EXACT,
-            'receiver.id' => SearchFilter::STRATEGY_EXACT,
-        ]
-    )
 ]
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
@@ -84,6 +81,7 @@ class Message
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->type = "MESSAGE";
     }
 
 

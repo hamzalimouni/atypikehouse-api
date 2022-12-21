@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         //new Post(),
         new Patch(
-            security: "is_granted('ROLE_USER') and object == user",
+            security: "is_granted('ROLE_USER') and object == user || is_granted('ROLE_ADMIN')",
             name: 'update',
             uriTemplate: '/users/{id}/update',
             controller: UserUpdateController::class
@@ -51,8 +51,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         //     controller: MeController::class,
         // ),
     ],
-    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:message', 'read:review']],
-    denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review']],
+    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:review']],
+    denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review', 'write:message']],
 )]
 //#[Get(normalizationContext: ['groups' => ['read:user']])]
 
