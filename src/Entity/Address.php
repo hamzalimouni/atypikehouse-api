@@ -37,7 +37,7 @@ class Address
     private ?string $address = null;
 
     #[ORM\Column(length: 64)]
-    #[Groups(['read:address', 'write:address', 'read:housecollcetion', 'read:reservation'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion', 'read:reservation', 'read:review'])]
     #[Assert\NotBlank]
     private ?string $city = null;
 
@@ -47,7 +47,7 @@ class Address
     private ?string $zipcode = null;
 
     #[ORM\Column(length: 64)]
-    #[Groups(['read:address', 'write:address', 'read:housecollcetion', 'read:reservation'])]
+    #[Groups(['read:address', 'write:address', 'read:housecollcetion', 'read:reservation', 'read:review'])]
     #[Assert\NotBlank]
     private ?string $country = null;
 

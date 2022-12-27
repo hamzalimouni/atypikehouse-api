@@ -110,7 +110,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation',  'read:review', 'read:user:collection'])]
     private ?Address $address = null;
 
     #[Groups(['read:user'])]

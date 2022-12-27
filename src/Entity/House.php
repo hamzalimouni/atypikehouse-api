@@ -58,7 +58,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             'address.city' => SearchFilter::STRATEGY_EXACT,
             'address.country' => SearchFilter::STRATEGY_EXACT,
             'status' => SearchFilter::STRATEGY_EXACT,
-            //'category.id' => SearchFilter::STRATEGY_EXACT,
+            'category.id' => SearchFilter::STRATEGY_EXACT,
         ]
     ),
     ApiFilter(
@@ -126,7 +126,7 @@ class House
     #[Assert\GreaterThan(value: 0)]
     private ?int $beds = null;
 
-    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class)]
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class, cascade: ['persist', 'remove'])]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\NotNull]
     private Collection $images;
@@ -155,7 +155,7 @@ class House
     #[Assert\NotNull]
     private ?Address $address = null;
 
-    #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class)]
+    #[ORM\OneToMany(mappedBy: 'house', targetEntity: Review::class, cascade: ['persist', 'remove'])]
     #[Groups(['read:house', 'read:housecollcetion'])]
     #[Assert\NotNull]
     private Collection $reviews;

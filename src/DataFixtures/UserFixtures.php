@@ -18,25 +18,43 @@ class UserFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        // create 30 User!
+        // create admin
+        $address = new Address();
+        $address->setAddress($faker->address());
+        $address->setCity($faker->city());
+        $address->setZipcode($faker->postcode());
+        $address->setCountry($faker->country());
+        // $address->setLongitude($faker->longitude($min = -180, $max = 180));
+        // $address->setLatitude($faker->latitude($min = -90, $max = 90));
+
+        $user = new User();
+        $user->setEmail('admin@email.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        $user->setPassword('$2y$13$yO9JDMzkaqU0jReACDaZzuS8NHwihaR7FFcHDfFk1qP2F0Zpg7fpu');
+        $user->setFirstname($faker->firstName());
+        $user->setLastname($faker->lastName());
+        $user->setNumber($faker->e164PhoneNumber());
+        $user->setBirthday($faker->dateTime());
+        $user->setAddress($address);
+        $manager->persist($user);
+
+        // create 30 more user!
         for ($i = 0; $i < 30; $i++) {
             $address = new Address();
             $address->setAddress($faker->address());
             $address->setCity($faker->city());
             $address->setZipcode($faker->postcode());
             $address->setCountry($faker->country());
-            $address->setLongitude($faker->longitude($min = -180, $max = 180));
-            $address->setLatitude($faker->latitude($min = -90, $max = 90));
+            // $address->setLongitude($faker->longitude($min = -180, $max = 180));
+            // $address->setLatitude($faker->latitude($min = -90, $max = 90));
 
             $user = new User();
             $user->setEmail($faker->email());
-            $user->setRoles();
-            $user->setPassword($this->userPasswordHasher->hashPassword($user, $faker->password()));
+            $user->setPassword('$2y$13$yO9JDMzkaqU0jReACDaZzuS8NHwihaR7FFcHDfFk1qP2F0Zpg7fpu');
             $user->setFirstname($faker->firstName());
             $user->setLastname($faker->lastName());
             $user->setNumber($faker->e164PhoneNumber());
-            $user->setBirthday($faker->birth());
-            $user->setStatus(mt_rand(0, 1));
+            $user->setBirthday($faker->dateTime());
             $user->setAddress($address);
             $manager->persist($user);
             $this->addReference("USER" . $i, $user);
