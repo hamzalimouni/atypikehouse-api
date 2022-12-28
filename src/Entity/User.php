@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\MeController;
 use App\Controller\RegisterController;
 use App\Controller\UserUpdateController;
 use App\Repository\UserRepository;
@@ -43,15 +44,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             name: 'register',
             uriTemplate: '/register',
             controller: RegisterController::class
-        )
+        ),
         //new Post(name: 'login', routeName: 'api_login_check', denormalizationContext: ['groups' => ['user:login']]),
-        // new Get(
-        //     name: 'me',
-        //     uriTemplate: '/me',
-        //     controller: MeController::class,
-        // ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['read:current:user']],
+            name: 'me',
+            uriTemplate: '/me',
+            controller: MeController::class,
+        ),
     ],
-    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:review']],
+    normalizationContext: ['groups' => ['read:user', 'read:address', 'read:review', 'read:reservation']],
     denormalizationContext: ['groups' => ['write:user', 'write:address', 'write:review', 'write:message']],
 )]
 //#[Get(normalizationContext: ['groups' => ['read:user']])]
@@ -62,22 +64,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
+    #[Groups(['read:user', 'read:current:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'user:login'])]
+    #[Groups(['read:user', 'read:current:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'user:login'])]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['read:user', 'read:user:collection'])]
+    #[Groups(['read:user', 'read:current:user', 'read:user:collection'])]
     private array $roles = [];
 
     #[ORM\Column]
-    #[Groups(['write:user', 'user:login'])]
+    #[Groups(['write:user', 'read:current:user', 'user:login'])]
     # @var string The hashed password
     #[Assert\Length(
         min: 8,
@@ -113,12 +115,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:user', 'write:user', 'read:reservation',  'read:review', 'read:user:collection'])]
     private ?Address $address = null;
 
-    #[Groups(['read:user'])]
+    // #[Groups(['read:user'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
     private Collection $reservations;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
-    #[Groups(['read:user'])]
+    // #[Groups(['read:user', 'read:user:collection'])]
     private Collection $reviews;
 
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
@@ -130,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $receivedmessages;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: House::class)]
-    #[Groups(['read:user'])]
+    // #[Groups(['read:user'])]
     private Collection $houses;
 
     #[ORM\Column]

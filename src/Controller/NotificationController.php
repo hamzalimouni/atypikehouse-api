@@ -28,8 +28,15 @@ class NotificationController extends AbstractController
 
     public function __invoke(#[CurrentUser] ?User $user, Request $request): JsonResponse
     {
-        $notifications = $this->notificationRepository->findUserNotifications($user);
-        $data = $this->serializer->serialize($notifications, JsonEncoder::FORMAT);
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
+
+        if (count($user->getHouses()) > 0 || $user->getRoles()[0] === 'ROLE_ADMIN') {
+            $notifications = $this->notificationRepository->findProprietaireNotifications($user);
+            $data = $this->serializer->serialize($notifications, JsonEncoder::FORMAT);
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        } else {
+            $notifications = $this->notificationRepository->findUserNotifications($user);
+            $data = $this->serializer->serialize($notifications, JsonEncoder::FORMAT);
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        }
     }
 }

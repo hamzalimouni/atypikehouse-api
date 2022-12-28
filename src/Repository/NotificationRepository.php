@@ -45,6 +45,18 @@ class NotificationRepository extends ServiceEntityRepository
     public function findUserNotifications($user): array
     {
         return $this->createQueryBuilder('n')
+            ->andWhere('( n.user = :user OR n.user is null ) AND n.created_at > :date AND n.type NOT IN (:hhh)')
+            ->setParameter('user', $user->getId())
+            ->setParameter('date', $user->getCreatedAt())
+            ->setParameter('hhh', ['NEW', 'EDIT', 'DELETE'])
+            ->orderBy('n.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findProprietaireNotifications($user): array
+    {
+        return $this->createQueryBuilder('n')
             ->andWhere('( n.user = :user OR n.user is null ) AND n.created_at > :date')
             ->setParameter('user', $user->getId())
             ->setParameter('date', $user->getCreatedAt())
