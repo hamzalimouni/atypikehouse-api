@@ -42,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             ),
             new Patch(
                 controller: HouseController::class,
-                security: "is_granted('ROLE_ADMIN') or object.owner == user",
+                security: "is_granted('ROLE_ADMIN')",
                 denormalizationContext: ['groups' => ['write:house', 'write:address', 'write:review']],
             ),
             new Delete(
@@ -126,7 +126,7 @@ class House
     #[Assert\GreaterThan(value: 0)]
     private ?int $beds = null;
 
-    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Image::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     #[Assert\NotNull]
     private Collection $images;
@@ -136,11 +136,11 @@ class House
     #[Assert\NotBlank]
     public ?string $status = null;
 
-    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'House', targetEntity: Disponibility::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['read:house', 'write:house'])]
     private Collection $disponibilities;
 
-    #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class)]
+    #[ORM\OneToMany(mappedBy: 'house', targetEntity: ProprietyValue::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['read:house', 'write:house'])]
     #[Assert\NotNull]
     private Collection $properties;
