@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
+use App\Repository\ImageRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,14 +11,23 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class MediaController extends AbstractController
 {
-    #[Route('/media/images/{img}', name: 'app_media')]
-    public function index(string $img): Response
+
+    public function __construct(
+        // private EntityManagerInterface $entityManager,
+        private ImageRepository $imageRepository,
+    ) {
+    }
+
+    // #[Route('/media/images/{img}', name: 'app_media')]
+    public function __invoke(string $id)
     {
-        $filepath = $this->getParameter('kernel.project_dir') . "\public\media\\" . $img;
+
+        $image = $this->imageRepository->findBy(['id' => $id])[0];
+        $filepath = $this->getParameter('kernel.project_dir') . "\public\media\\" . $image->getFileName();
 
         $response = new Response(file_get_contents($filepath));
 
-        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $img);
+        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $image->getFileName());
 
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Length', filesize($filepath));

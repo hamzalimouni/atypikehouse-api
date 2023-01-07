@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Controller\CreateMediaObjectAction;
 use App\Controller\ImageController;
+use App\Controller\MediaController;
+use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -24,7 +26,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post()
+        new Post(),
+        new Get(
+            // name: 'img',
+            uriTemplate: '/images/image/{id}',
+            controller: MediaController::class,
+        ),
     ]
 )]
 class Image
@@ -32,6 +39,7 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:house', 'write:house', 'read:housecollcetion', 'read:reservation'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
