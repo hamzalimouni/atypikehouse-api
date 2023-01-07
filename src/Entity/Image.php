@@ -24,12 +24,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     // normalizationContext: ['groups' => ['media_object:read']], 
     // types: ['https://schema.org/MediaObject'],
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
+        // new Get(),
+        // new GetCollection(),
+        // new Post(),
         new Get(
             // name: 'img',
-            uriTemplate: '/images/image/{id}',
+            // uriTemplate: '/images/image/{id}',
             controller: MediaController::class,
         ),
     ]
