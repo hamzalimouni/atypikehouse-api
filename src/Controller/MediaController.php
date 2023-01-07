@@ -23,7 +23,7 @@ class MediaController extends AbstractController
     {
         // dd($request->get('id'));
         $image = $this->imageRepository->findBy(['id' => $request->get('id')])[0];
-        $filepath = $this->getParameter('kernel.project_dir') . "\public\media\\" . $image->getFileName();
+        $filepath = $this->getParameter('kernel.project_dir') . "/public/media/" . $image->getFileName();
 
         $response = new Response(file_get_contents($filepath));
 
