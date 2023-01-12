@@ -64,18 +64,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:user', 'read:current:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
+    #[Groups(['read:user', 'read:current:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'read:request'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['read:user', 'read:current:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'user:login'])]
+    #[Groups(['read:user', 'read:current:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'user:login', 'read:request'])]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['read:user', 'read:current:user', 'read:user:collection'])]
+    #[Groups(['read:user', 'read:current:user', 'read:user:collection', 'read:request', 'write:user'])]
     private array $roles = [];
 
     #[ORM\Column]
@@ -87,22 +87,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'read:request'])]
     #[Assert\NotBlank]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:message', 'read:review', 'read:user:collection', 'read:request'])]
     #[Assert\NotBlank]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 32)]
-    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation', 'read:user:collection', 'read:request'])]
     #[Assert\NotBlank]
     private ?string $number = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['read:user', 'write:user', 'read:user:collection', 'read:reservation'])]
+    #[Groups(['read:user', 'write:user', 'read:user:collection', 'read:reservation', 'read:request'])]
     #[Assert\NotBlank]
     private ?\DateTimeInterface $birthday = null;
 
@@ -112,7 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['read:user', 'write:user', 'read:reservation',  'read:review', 'read:user:collection'])]
+    #[Groups(['read:user', 'write:user', 'read:reservation',  'read:review', 'read:user:collection', 'read:request'])]
     private ?Address $address = null;
 
     // #[Groups(['read:user'])]
@@ -141,6 +141,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Notification::class)]
     private Collection $notifications;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?OwnerRequest $ownerRequest = null;
 
     public function __construct()
     {
@@ -486,6 +489,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $notification->setUserId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwnerRequest(): ?OwnerRequest
+    {
+        return $this->ownerRequest;
+    }
+
+    public function setOwnerRequest(OwnerRequest $ownerRequest): self
+    {
+        // set the owning side of the relation if necessary
+        if ($ownerRequest->getUser() !== $this) {
+            $ownerRequest->setUser($this);
+        }
+
+        $this->ownerRequest = $ownerRequest;
 
         return $this;
     }

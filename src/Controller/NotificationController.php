@@ -28,8 +28,7 @@ class NotificationController extends AbstractController
 
     public function __invoke(#[CurrentUser] ?User $user, Request $request): JsonResponse
     {
-
-        if (count($user->getHouses()) > 0 || $user->getRoles()[0] === 'ROLE_ADMIN') {
+        if (in_array('ROLE_OWNER', $user->getRoles()) || in_array('ROLE_ADMIN', $user->getRoles())) {
             $notifications = $this->notificationRepository->findProprietaireNotifications($user);
             $data = $this->serializer->serialize($notifications, JsonEncoder::FORMAT);
             return new JsonResponse($data, Response::HTTP_OK, [], true);

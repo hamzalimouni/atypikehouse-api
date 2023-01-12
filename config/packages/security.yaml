@@ -46,7 +46,10 @@ security:
         - { path: ^/api/me,       roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
-
+    role_hierarchy:
+            ROLE_OWNER: ['ROLE_USER']
+            ROLE_ADMIN: ['ROLE_OWNER']
+            
 when@test:
     security:
         password_hashers:
