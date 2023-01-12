@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\OwnerRequestController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: OwnerRequestRepository::class)]
@@ -28,6 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 security: "is_granted('ROLE_USER')",
             ),
             new Patch(
+                controller: OwnerRequestController::class,
                 security: "is_granted('ROLE_ADMIN')",
             ),
         ],
