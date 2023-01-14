@@ -1,0 +1,6 @@
+api_platform:
+    defaults:
+        pagination_client_enabled: true
+    collection:
+        pagination:
+            enabled_parameter_name: pagination
