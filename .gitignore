@@ -8,6 +8,7 @@
 /public/media/*
 /var/
 /vendor/
+/.env
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
